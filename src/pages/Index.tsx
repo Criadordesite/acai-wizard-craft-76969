@@ -1,52 +1,104 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
+import { Hero } from "@/components/Hero";
+import StoreStatus from "@/components/StoreStatus";
+import { PromoBanner } from "@/components/PromoBanner";
+import { PopularityPopup } from "@/components/PopularityPopup";
 import { ProductCard } from "@/components/ProductCard";
+import { PersonalizationModal, CustomizationData } from "@/components/PersonalizationModal";
 import { CartModal, CartItem } from "@/components/CartModal";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { Footer } from "@/components/Footer";
+import { Badge } from "@/components/ui/badge";
 
-const products = [
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  isReady: boolean;
+  requiresCustomization?: boolean;
+  isBestSeller?: boolean;
+}
+
+const acaiProducts: Product[] = [
   {
     id: "acai-300",
-    name: "Açaí Tradicional 300ml",
-    description: "Açaí puro e cremoso, perfeito para matar a vontade",
-    price: 12.90,
-    isReady: true,
+    name: "Açaí no Copo 300ml",
+    description: "Açaí puro e cremoso",
+    price: 8.99,
+    isReady: false,
+    requiresCustomization: true,
+  },
+  {
+    id: "acai-400",
+    name: "Açaí no Copo 400ml",
+    description: "Tamanho ideal para matar a fome",
+    price: 12.99,
+    isReady: false,
+    requiresCustomization: true,
   },
   {
     id: "acai-500",
-    name: "Açaí Tradicional 500ml",
+    name: "Açaí no Copo 500ml",
     description: "Mais açaí para você aproveitar",
-    price: 18.90,
-    isReady: true,
-  },
-  {
-    id: "acai-1000",
-    name: "Açaí Tradicional 1L",
-    description: "Açaí generoso para compartilhar",
-    price: 32.90,
-    isReady: true,
+    price: 18.99,
+    isReady: false,
+    requiresCustomization: true,
   },
   {
     id: "barca",
     name: "Barca de Açaí",
-    description: "Nossa famosa barca com 2kg de açaí",
-    price: 89.90,
+    description: "Nossa famosa barca para compartilhar",
+    price: 31.99,
+    isReady: false,
+    requiresCustomization: true,
+    isBestSeller: true,
+  },
+];
+
+const beverages: Product[] = [
+  {
+    id: "refri-220",
+    name: "Refrigerante 220ml",
+    description: "Lata gelada",
+    price: 3.99,
     isReady: true,
   },
   {
-    id: "suco-laranja",
-    name: "Suco de Laranja 500ml",
-    description: "Suco natural de laranja fresquinho",
-    price: 8.90,
+    id: "refri-350",
+    name: "Refrigerante 350ml",
+    description: "Garrafa gelada",
+    price: 5.99,
     isReady: true,
   },
   {
-    id: "agua",
-    name: "Água Mineral 500ml",
-    description: "Água mineral gelada",
-    price: 3.50,
+    id: "redbull",
+    name: "Red Bull 355ml",
+    description: "Energia para o seu dia",
+    price: 8.99,
+    isReady: true,
+  },
+  {
+    id: "suco-300",
+    name: "Suco Natural 300ml",
+    description: "Suco natural fresquinho",
+    price: 3.99,
+    isReady: true,
+  },
+  {
+    id: "suco-500",
+    name: "Suco Natural 500ml",
+    description: "Suco natural tamanho grande",
+    price: 6.99,
+    isReady: true,
+  },
+  {
+    id: "vitamina",
+    name: "Vitamina 500ml",
+    description: "Vitamina cremosa e nutritiva",
+    price: 12.99,
     isReady: true,
   },
 ];
@@ -56,18 +108,31 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [promoApplied, setPromoApplied] = useState(false);
+  const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const addToCart = (productId: string) => {
-    const product = products.find((p) => p.id === productId);
+  const allProducts = [...acaiProducts, ...beverages];
+
+  const handleProductClick = (productId: string) => {
+    const product = allProducts.find((p) => p.id === productId);
     if (!product) return;
 
+    if (product.requiresCustomization) {
+      setSelectedProduct(product);
+      setIsPersonalizationOpen(true);
+    } else {
+      addDirectToCart(product);
+    }
+  };
+
+  const addDirectToCart = (product: Product) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === productId);
+      const existingItem = prevCart.find((item) => item.id === product.id);
       
       let newCart;
-      if (existingItem) {
+      if (existingItem && product.isReady) {
         newCart = prevCart.map((item) =>
-          item.id === productId
+          item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -75,9 +140,28 @@ const Index = () => {
         newCart = [...prevCart, { ...product, quantity: 1 }];
       }
 
+      return newCart;
+    });
+
+    toast.success(`${product.name} adicionado ao carrinho!`);
+  };
+
+  const handleCustomizationConfirm = (customization: CustomizationData) => {
+    if (!selectedProduct) return;
+
+    const customizedProduct = {
+      ...selectedProduct,
+      id: `${selectedProduct.id}-${Date.now()}`, // ID único para cada personalização
+      name: `${selectedProduct.name} ${customization.freeToppings.length > 0 ? `(${customization.freeToppings.join(", ")})` : ""}`,
+      price: customization.totalPrice,
+    };
+
+    setCart((prevCart) => {
+      const newCart = [...prevCart, { ...customizedProduct, quantity: 1 }];
+
       // Aplicar promoção apenas uma vez
       if (!promoApplied) {
-        const barcaCount = newCart.find((item) => item.id === "barca")?.quantity || 0;
+        const barcaCount = newCart.filter((item) => item.id.startsWith("barca")).reduce((acc, item) => acc + item.quantity, 0);
         if (barcaCount >= 2) {
           const freeAcai = newCart.find((item) => item.id === "acai-300-promo");
           if (!freeAcai) {
@@ -96,7 +180,7 @@ const Index = () => {
       return newCart;
     });
 
-    toast.success(`${product.name} adicionado ao carrinho!`);
+    toast.success(`${selectedProduct.name} personalizado adicionado ao carrinho!`);
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -135,33 +219,85 @@ const Index = () => {
       <Header cartItemsCount={totalItems} onCartClick={() => setIsCartOpen(true)} />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
-            Cardápio
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Escolha seus produtos favoritos e adicione ao carrinho
-          </p>
+        {/* Hero Carousel */}
+        <Hero />
+
+        {/* Status da Loja */}
+        <div className="flex justify-center my-6">
+          <StoreStatus />
         </div>
 
-        <div className="mb-8 bg-primary/10 border-2 border-primary rounded-lg p-4">
-          <p className="text-center font-semibold text-foreground">
-            🎉 PROMOÇÃO: Compre 2 Barcas de Açaí e ganhe 1 Açaí 300ml GRÁTIS!
-          </p>
+        {/* Banner Promoção */}
+        <PromoBanner />
+
+        {/* Açaís */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6 text-foreground">
+            Açaís
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {acaiProducts.map((product) => (
+              <div key={product.id} className="relative">
+                {product.isBestSeller && (
+                  <Badge className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-lg">
+                    🔥 MAIS SAINDO NA SEMANA
+                  </Badge>
+                )}
+                <ProductCard
+                  {...product}
+                  onAdd={() => handleProductClick(product.id)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              {...product}
-              onAdd={() => addToCart(product.id)}
-            />
-          ))}
+        {/* Bebidas */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6 text-foreground">
+            Bebidas
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {beverages.map((product) => (
+              <ProductCard
+                key={product.id}
+                {...product}
+                onAdd={() => handleProductClick(product.id)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Formas de Pagamento */}
+        <div className="bg-card border-2 rounded-lg p-6 shadow-card">
+          <h3 className="text-2xl font-bold mb-4 text-center text-foreground">
+            Formas de Pagamento
+          </h3>
+          <div className="flex flex-wrap justify-center gap-6 items-center">
+            <div className="text-center">
+              <div className="text-4xl mb-2">💵</div>
+              <p className="font-semibold">Dinheiro</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">📱</div>
+              <p className="font-semibold">PIX</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">💳</div>
+              <p className="font-semibold">Cartão de Crédito</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">💳</div>
+              <p className="font-semibold">Cartão de Débito</p>
+            </div>
+          </div>
         </div>
       </main>
 
       <Footer />
+
+      {/* Gatilhos Mentais */}
+      <PopularityPopup />
 
       <CartModal
         isOpen={isCartOpen}
@@ -178,6 +314,19 @@ const Index = () => {
         items={cart}
         total={total}
       />
+
+      {selectedProduct && (
+        <PersonalizationModal
+          isOpen={isPersonalizationOpen}
+          onClose={() => {
+            setIsPersonalizationOpen(false);
+            setSelectedProduct(null);
+          }}
+          productName={selectedProduct.name}
+          basePrice={selectedProduct.price}
+          onConfirm={handleCustomizationConfirm}
+        />
+      )}
     </div>
   );
 };

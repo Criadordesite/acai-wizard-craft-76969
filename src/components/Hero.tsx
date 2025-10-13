@@ -1,30 +1,55 @@
-const Hero = () => {
+import { useEffect, useState } from "react";
+import heroImage1 from "@/assets/hero-acai-1.jpg";
+import heroImage2 from "@/assets/hero-acai-2.jpg";
+import heroImage3 from "@/assets/hero-acai-3.jpg";
+import acaiCopo from "@/assets/acai-copo.webp";
+import barcaAcai from "@/assets/barca-acai.jpeg";
+
+const images = [heroImage1, heroImage2, heroImage3, acaiCopo, barcaAcai];
+
+export const Hero = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 4000); // Muda a cada 4 segundos
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="relative bg-gradient-to-r from-purple-600 to-pink-600 text-white py-20">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl md:text-6xl font-bold mb-6">
-          O Melhor Açaí da Cidade! 🍇
-        </h2>
-        <p className="text-xl md:text-2xl mb-8 opacity-90">
-          Açaí fresquinho, personalizado do seu jeito, entregue na sua casa!
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
-            <i className="ri-truck-line text-2xl mb-2 block"></i>
-            <span className="text-sm font-semibold">Entrega Rápida</span>
-          </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
-            <i className="ri-leaf-line text-2xl mb-2 block"></i>
-            <span className="text-sm font-semibold">100% Natural</span>
-          </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
-            <i className="ri-heart-line text-2xl mb-2 block"></i>
-            <span className="text-sm font-semibold">Feito com Amor</span>
-          </div>
+    <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden rounded-lg mb-8">
+      {images.map((image, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            index === currentIndex ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <img
+            src={image}
+            alt={`Açaí ${index + 1}`}
+            className="w-full h-full object-cover"
+          />
         </div>
+      ))}
+      
+      {/* Indicadores */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all ${
+              index === currentIndex
+                ? "bg-primary w-8"
+                : "bg-white/50 hover:bg-white/75"
+            }`}
+            aria-label={`Ir para imagem ${index + 1}`}
+          />
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
-
-export default Hero;
