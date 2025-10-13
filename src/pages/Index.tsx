@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { CartModal, CartItem } from "@/components/CartModal";
 import { CheckoutModal } from "@/components/CheckoutModal";
-import { Toast } from "@/components/Toast";
 import { Footer } from "@/components/Footer";
 
 const products = [
@@ -55,12 +55,7 @@ const Index = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: "" });
   const [promoApplied, setPromoApplied] = useState(false);
-
-  const showToast = (message: string) => {
-    setToast({ show: true, message });
-  };
 
   const addToCart = (productId: string) => {
     const product = products.find((p) => p.id === productId);
@@ -93,7 +88,7 @@ const Index = () => {
               quantity: 1,
             });
             setPromoApplied(true);
-            showToast("🎉 Promoção aplicada! Açaí 300ml grátis adicionado!");
+            toast.success("🎉 Promoção aplicada! Açaí 300ml grátis adicionado!");
           }
         }
       }
@@ -101,7 +96,7 @@ const Index = () => {
       return newCart;
     });
 
-    showToast(`${product.name} adicionado ao carrinho!`);
+    toast.success(`${product.name} adicionado ao carrinho!`);
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -182,12 +177,6 @@ const Index = () => {
         onClose={() => setIsCheckoutOpen(false)}
         items={cart}
         total={total}
-      />
-
-      <Toast
-        show={toast.show}
-        message={toast.message}
-        onClose={() => setToast({ show: false, message: "" })}
       />
     </div>
   );
