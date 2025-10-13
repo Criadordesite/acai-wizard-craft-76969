@@ -1,248 +1,240 @@
 import { useState } from "react";
-import { CartItem, Address } from "@/types";
-import { NUMERO_WHATSAPP } from "@/data/products";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { CartItem } from "./CartModal";
 
 interface CheckoutModalProps {
-  cart: CartItem[];
+  isOpen: boolean;
   onClose: () => void;
+  items: CartItem[];
+  total: number;
 }
 
-const CheckoutModal = ({ cart, onClose }: CheckoutModalProps) => {
-  const [nome, setNome] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [cep, setCep] = useState('');
-  const [numero, setNumero] = useState('');
-  const [semNumero, setSemNumero] = useState(false);
-  const [complemento, setComplemento] = useState('');
-  const [endereco, setEndereco] = useState<Address | null>(null);
-  const [loading, setLoading] = useState(false);
+export const CheckoutModal = ({ isOpen, onClose, items, total }: CheckoutModalProps) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    cep: "",
+    street: "",
+    number: "",
+    complement: "",
+    reference: "",
+    neighborhood: "",
+    city: "",
+    payment: "dinheiro",
+    troco: "",
+  });
+  
+  const [noNumber, setNoNumber] = useState(false);
 
-  const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`;
-  const total = cart.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
-
-  const buscarCEP = async () => {
-    const cepLimpo = cep.replace(/\D/g, '');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     
-    if (cepLimpo.length !== 8) {
-      alert('Por favor, digite um CEP válido com 8 dígitos');
+    if (!formData.name || !formData.phone || !formData.street || !formData.neighborhood) {
+      alert("Por favor, preencha todos os campos obrigatórios");
       return;
     }
 
-    setLoading(true);
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-      const data = await response.json();
-      
-      if (data.erro) {
-        alert('CEP não encontrado');
-        setEndereco(null);
-      } else {
-        setEndereco({
-          logradouro: data.logradouro,
-          bairro: data.bairro,
-          localidade: data.localidade,
-          uf: data.uf,
-          cep: data.cep
-        });
-      }
-    } catch (error) {
-      console.error('Erro ao buscar CEP:', error);
-      alert('Erro ao buscar CEP. Tente novamente.');
-      setEndereco(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const finalizarPedido = () => {
-    if (!nome || !telefone || !cep || !endereco) {
-      alert('Por favor, preencha todos os campos obrigatórios e busque o endereço pelo CEP.');
+    if (!noNumber && !formData.number) {
+      alert("Por favor, informe o número do endereço ou marque a opção 'Endereço sem número'");
       return;
     }
 
-    if (!numero && !semNumero) {
-      alert('Por favor, informe o número da casa ou marque "Sem número".');
-      return;
-    }
+    const itemsList = items
+      .map((item) => `${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2)}`)
+      .join("%0A");
 
-    let message = `🍇 *PEDIDO - THE BEST AÇAÍ* 🍇\n\n`;
-    message += `👤 *Cliente:* ${nome}\n`;
-    message += `📱 *Telefone:* ${telefone}\n\n`;
-    message += `📍 *Endereço de Entrega:*\n`;
-    message += `${endereco.logradouro}`;
-    if (!semNumero && numero) {
-      message += `, ${numero}`;
-    } else if (semNumero) {
-      message += ` (Sem número)`;
-    }
-    message += `\n${endereco.bairro} - ${endereco.localidade}/${endereco.uf}\n`;
-    message += `CEP: ${endereco.cep}\n`;
-    if (complemento) {
-      message += `Complemento: ${complemento}\n`;
-    }
-    message += `\n🛒 *ITENS DO PEDIDO:*\n`;
+    const addressNumber = noNumber ? "S/N" : formData.number;
+    const complementText = formData.complement ? `Complemento: ${formData.complement}%0A` : "";
+    const referenceText = formData.reference ? `Referência: ${formData.reference}%0A` : "";
+    const trocoText = formData.payment === "dinheiro" && formData.troco 
+      ? `Troco para: R$ ${formData.troco}%0A` 
+      : "";
 
-    cart.forEach((item, index) => {
-      message += `\n${index + 1}. ${item.nome} (${item.quantidade}x) - ${formatPrice(item.preco * item.quantidade)}\n`;
-      
-      if (item.personalizacao) {
-        Object.entries(item.personalizacao).forEach(([categoria, ingredientes]) => {
-          if (ingredientes.length > 0) {
-            const emojiMap: Record<string, string> = {
-              "Frutas": "🍓",
-              "Graos": "🌾",
-              "Powders": "💪",
-              "Toppings": "🥥",
-              "Especiais": "💰"
-            };
-            const emoji = emojiMap[categoria] || "";
-            message += `   ${emoji} ${categoria}: ${ingredientes.join(', ')}\n`;
-          }
-        });
-      }
-    });
+    const message = `*🛍️ NOVO PEDIDO - THE BEST AÇAÍ*%0A%0A` +
+      `*Itens:*%0A${itemsList}%0A%0A` +
+      `*Total: R$ ${total.toFixed(2)}*%0A%0A` +
+      `*👤 Cliente:* ${formData.name}%0A` +
+      `*📱 Telefone:* ${formData.phone}%0A%0A` +
+      `*📍 Endereço:*%0A` +
+      `${formData.street}, ${addressNumber}%0A` +
+      `${complementText}` +
+      `Bairro: ${formData.neighborhood}%0A` +
+      `${formData.city ? `Cidade: ${formData.city}%0A` : ""}` +
+      `${referenceText}%0A` +
+      `*💳 Pagamento:* ${formData.payment}%0A` +
+      `${trocoText}`;
 
-    message += `\n💰 *TOTAL A PAGAR: ${formatPrice(total)}*\n\n`;
-    message += `Obrigado pela preferência! 🙏`;
-
-    const whatsappUrl = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    const whatsappNumber = "5511999999999"; // Substituir pelo número real
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+    
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-bold text-purple-800">Finalizar Pedido</h3>
-            <button 
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 cursor-pointer"
-            >
-              <i className="ri-close-line text-2xl"></i>
-            </button>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">Finalizar Pedido</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nome Completo *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Seu nome"
+              required
+            />
           </div>
 
-          <div className="space-y-6">
-            {/* Dados do Cliente */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-purple-700">Seus Dados</h4>
-              <div className="space-y-4">
-                <input 
-                  type="text" 
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Seu nome completo" 
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                />
-                <input 
-                  type="tel" 
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
-                  placeholder="Seu WhatsApp (11) 99999-9999" 
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                />
-              </div>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">WhatsApp *</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="(11) 99999-9999"
+              required
+            />
+          </div>
 
-            {/* Endereço */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-purple-700">Endereço de Entrega</h4>
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    value={cep}
-                    onChange={(e) => setCep(e.target.value)}
-                    placeholder="CEP (apenas números)" 
-                    maxLength={8}
-                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                  />
-                  <button 
-                    onClick={buscarCEP}
-                    disabled={loading}
-                    className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors whitespace-nowrap cursor-pointer disabled:opacity-50"
-                  >
-                    {loading ? 'Buscando...' : 'Buscar'}
-                  </button>
-                </div>
-
-                {endereco && (
-                  <div className="space-y-2 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p><strong>Logradouro:</strong> {endereco.logradouro}</p>
-                    <p><strong>Bairro:</strong> {endereco.bairro}</p>
-                    <p><strong>Cidade:</strong> {endereco.localidade}/{endereco.uf}</p>
-                    <p><strong>CEP:</strong> {endereco.cep}</p>
-                  </div>
-                )}
-
-                <div className="flex gap-4">
-                  <input 
-                    type="text" 
-                    value={numero}
-                    onChange={(e) => setNumero(e.target.value)}
-                    disabled={semNumero}
-                    placeholder="Número da casa" 
-                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none disabled:bg-gray-100"
-                  />
-                  <label className="flex items-center space-x-2 whitespace-nowrap">
-                    <input 
-                      type="checkbox" 
-                      checked={semNumero}
-                      onChange={(e) => setSemNumero(e.target.checked)}
-                      className="rounded"
-                    />
-                    <span className="text-sm">Sem número</span>
-                  </label>
-                </div>
-
-                <input 
-                  type="text" 
-                  value={complemento}
-                  onChange={(e) => setComplemento(e.target.value)}
-                  placeholder="Complemento (apartamento, bloco, etc.)" 
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Resumo do Pedido */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="text-lg font-semibold mb-3 text-purple-700">Resumo do Pedido</h4>
-              <div className="space-y-2">
-                {cart.map((item, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span>{item.nome} ({item.quantidade}x)</span>
-                    <span>{formatPrice(item.preco * item.quantidade)}</span>
-                  </div>
-                ))}
-                <div className="border-t pt-2 flex justify-between font-bold">
-                  <span>Total:</span>
-                  <span>{formatPrice(total)}</span>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cep">CEP</Label>
+              <Input
+                id="cep"
+                value={formData.cep}
+                onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
+                placeholder="00000-000"
+              />
             </div>
           </div>
 
-          <div className="mt-8 flex gap-4">
-            <button 
-              onClick={onClose}
-              className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold whitespace-nowrap cursor-pointer"
-            >
-              Voltar
-            </button>
-            <button 
-              onClick={finalizarPedido}
-              className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold whitespace-nowrap cursor-pointer"
-            >
-              <i className="ri-whatsapp-line mr-2"></i>
-              Finalizar no WhatsApp
-            </button>
+          <div className="space-y-2">
+            <Label htmlFor="street">Endereço *</Label>
+            <Input
+              id="street"
+              value={formData.street}
+              onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+              placeholder="Rua, Avenida..."
+              required
+            />
           </div>
-        </div>
-      </div>
-    </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="number">Número {!noNumber && "*"}</Label>
+              <Input
+                id="number"
+                value={formData.number}
+                onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                placeholder="123"
+                disabled={noNumber}
+                required={!noNumber}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="complement">Complemento</Label>
+              <Input
+                id="complement"
+                value={formData.complement}
+                onChange={(e) => setFormData({ ...formData, complement: e.target.value })}
+                placeholder="Apto, Bloco..."
+                disabled={noNumber}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="noNumber"
+              checked={noNumber}
+              onCheckedChange={(checked) => {
+                setNoNumber(checked as boolean);
+                if (checked) {
+                  setFormData({ ...formData, number: "", complement: "" });
+                }
+              }}
+            />
+            <Label htmlFor="noNumber" className="text-sm font-normal cursor-pointer">
+              Endereço sem número ou sem complemento
+            </Label>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="reference">Ponto de Referência</Label>
+            <Input
+              id="reference"
+              value={formData.reference}
+              onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+              placeholder="Próximo ao..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="neighborhood">Bairro *</Label>
+              <Input
+                id="neighborhood"
+                value={formData.neighborhood}
+                onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
+                placeholder="Seu bairro"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="city">Cidade</Label>
+              <Input
+                id="city"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                placeholder="Sua cidade"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Forma de Pagamento *</Label>
+            <RadioGroup value={formData.payment} onValueChange={(value) => setFormData({ ...formData, payment: value })}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="dinheiro" id="dinheiro" />
+                <Label htmlFor="dinheiro" className="font-normal cursor-pointer">Dinheiro</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pix" id="pix" />
+                <Label htmlFor="pix" className="font-normal cursor-pointer">PIX</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="cartao" id="cartao" />
+                <Label htmlFor="cartao" className="font-normal cursor-pointer">Cartão (na entrega)</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {formData.payment === "dinheiro" && (
+            <div className="space-y-2">
+              <Label htmlFor="troco">Troco para quanto?</Label>
+              <Input
+                id="troco"
+                value={formData.troco}
+                onChange={(e) => setFormData({ ...formData, troco: e.target.value })}
+                placeholder="R$ 50,00"
+              />
+            </div>
+          )}
+
+          <Button type="submit" className="w-full bg-success hover:bg-success/90 text-success-foreground text-lg py-6">
+            Enviar Pedido via WhatsApp
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
-
-export default CheckoutModal;

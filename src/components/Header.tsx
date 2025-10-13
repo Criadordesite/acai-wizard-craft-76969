@@ -1,39 +1,42 @@
-import StoreStatus from "./StoreStatus";
+import { ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import logo from "@/assets/logo.webp";
 
 interface HeaderProps {
-  cartCount: number;
-  onOpenCart: () => void;
+  cartItemsCount: number;
+  onCartClick: () => void;
 }
 
-const Header = ({ cartCount, onOpenCart }: HeaderProps) => {
+export const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-40">
+    <header className="bg-secondary sticky top-0 z-50 border-b border-border/40 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img 
-              alt="The Best Açaí Logo" 
-              className="w-12 h-12 rounded-full object-cover" 
-              src="https://static.readdy.ai/image/0a1685e22902e5e8eea3f873bad279a5/7d0f4c389871664d6775fdba136f73a5.jpeg"
-            />
-            <div>
-              <h1 className="text-2xl font-bold text-purple-800 font-pacifico">
-                The Best Açaí
-              </h1>
-              <StoreStatus />
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="THE BEST AÇAÍ Logo" className="h-12 w-auto" />
+            <div className="flex flex-col">
+              <span className="text-primary-foreground font-bold text-xl tracking-tight">
+                THE BEST
+              </span>
+              <span className="text-primary font-bold text-2xl -mt-1 italic">
+                açaí
+              </span>
             </div>
           </div>
-          <button 
-            onClick={onOpenCart}
-            className="relative bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition-colors whitespace-nowrap cursor-pointer"
+          
+          <button
+            onClick={onCartClick}
+            className="relative bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-3 transition-all hover:scale-105 shadow-elegant"
           >
-            <i className="ri-shopping-cart-line mr-2"></i>
-            Carrinho ({cartCount})
+            <ShoppingCart className="h-6 w-6" />
+            {cartItemsCount > 0 && (
+              <Badge className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground border-2 border-secondary px-2 min-w-[24px] h-6 flex items-center justify-center font-bold">
+                {cartItemsCount}
+              </Badge>
+            )}
           </button>
         </div>
       </div>
     </header>
   );
 };
-
-export default Header;
