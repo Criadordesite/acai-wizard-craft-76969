@@ -91,7 +91,7 @@ export const PopularityPopup = () => {
         setProofData((prev) => {
           const updated = {
             ...prev,
-            viewers: Math.min(prev.viewers + Math.floor(Math.random() * 3),
+            viewers: prev.viewers + Math.floor(Math.random() * 3),
             dailySales: Math.random() > 0.7 ? prev.dailySales + 1 : prev.dailySales,
             weeklyOrders: Math.random() > 0.8 ? prev.weeklyOrders + 1 : prev.weeklyOrders,
           };
