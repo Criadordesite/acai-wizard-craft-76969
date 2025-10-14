@@ -213,7 +213,7 @@ export const CheckoutModal = ({ isOpen, onClose, items, total }: CheckoutModalPr
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="cartao" id="cartao" />
-                <Label htmlFor="cartao" className="font-normal cursor-pointer">Cartão (na entrega)</Label>
+                <Label htmlFor="cartao" className="font-normal cursor-pointer">Cartão de Crédito ou Cartão de Débito</Label>
               </div>
             </RadioGroup>
           </div>

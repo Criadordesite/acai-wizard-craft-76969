@@ -101,6 +101,20 @@ const beverages: Product[] = [
     price: 12.99,
     isReady: true,
   },
+  {
+    id: "agua-com-gas",
+    name: "Água Crystal 500ml com gás",
+    description: "Água mineral com gás",
+    price: 3.49,
+    isReady: true,
+  },
+  {
+    id: "agua-sem-gas",
+    name: "Água Crystal 500ml sem gás",
+    description: "Água mineral natural",
+    price: 2.99,
+    isReady: true,
+  },
 ];
 
 const Index = () => {
@@ -152,7 +166,7 @@ const Index = () => {
     const customizedProduct = {
       ...selectedProduct,
       id: `${selectedProduct.id}-${Date.now()}`, // ID único para cada personalização
-      name: `${selectedProduct.name} ${customization.freeToppings.length > 0 ? `(${customization.freeToppings.join(", ")})` : ""}`,
+      name: `${selectedProduct.name} (${[...customization.freeFruits, ...customization.freeConfeitos, ...customization.paidToppings, customization.syrup].filter(Boolean).join(", ")})`,
       price: customization.totalPrice,
     };
 

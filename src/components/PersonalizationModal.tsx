@@ -14,19 +14,26 @@ interface PersonalizationModalProps {
 }
 
 export interface CustomizationData {
-  freeToppings: string[];
+  freeFruits: string[];
+  freeConfeitos: string[];
   paidToppings: string[];
   syrup: string;
   totalPrice: number;
 }
 
-const freeToppingsOptions = [
-  "Banana",
-  "Morango",
-  "Granola",
-  "Leite em Pó",
-  "Paçoca",
-  "Amendoim",
+const freeFruitOptions = [
+  "Morango fresco",
+  "Pêssego em calda",
+  "Manga ou kiwi picado",
+  "Frutas cristalizadas",
+];
+
+const freeConfeitosOptions = [
+  "Granulado colorido ou de chocolate",
+  "Confetes tipo M&M",
+  "Biscoito triturado (Oreo, cookies)",
+  "Marshmallow",
+  "Gotas de chocolate",
 ];
 
 const paidToppingsOptions = [
@@ -36,9 +43,12 @@ const paidToppingsOptions = [
 ];
 
 const syrupOptions = [
-  { name: "Morango", price: 1.99 },
-  { name: "Chocolate", price: 1.99 },
-  { name: "Caramelo", price: 1.99 },
+  { name: "Morango", price: 0 },
+  { name: "Caramelo", price: 0 },
+  { name: "Doce de leite", price: 0 },
+  { name: "Maracujá", price: 0 },
+  { name: "Menta", price: 0 },
+  { name: "Baunilha", price: 0 },
 ];
 
 export const PersonalizationModal = ({
@@ -48,17 +58,28 @@ export const PersonalizationModal = ({
   basePrice,
   onConfirm,
 }: PersonalizationModalProps) => {
-  const [freeToppings, setFreeToppings] = useState<string[]>([]);
+  const [freeFruits, setFreeFruits] = useState<string[]>([]);
+  const [freeConfeitos, setFreeConfeitos] = useState<string[]>([]);
   const [paidToppings, setPaidToppings] = useState<string[]>([]);
   const [syrup, setSyrup] = useState<string>("");
 
-  const handleFreeToppingToggle = (topping: string) => {
-    if (freeToppings.includes(topping)) {
-      setFreeToppings(freeToppings.filter((t) => t !== topping));
-    } else if (freeToppings.length < 1) {
-      setFreeToppings([...freeToppings, topping]);
+  const handleFreeFruitToggle = (fruit: string) => {
+    if (freeFruits.includes(fruit)) {
+      setFreeFruits(freeFruits.filter((t) => t !== fruit));
+    } else if (freeFruits.length < 1) {
+      setFreeFruits([...freeFruits, fruit]);
     } else {
-      toast.error("Você pode escolher apenas 1 adicional grátis!");
+      toast.error("Você pode escolher apenas 1 fruta grátis!");
+    }
+  };
+
+  const handleFreeConfeitoToggle = (confeito: string) => {
+    if (freeConfeitos.includes(confeito)) {
+      setFreeConfeitos(freeConfeitos.filter((t) => t !== confeito));
+    } else if (freeConfeitos.length < 1) {
+      setFreeConfeitos([...freeConfeitos, confeito]);
+    } else {
+      toast.error("Você pode escolher apenas 1 confeito/crocante grátis!");
     }
   };
 
@@ -77,18 +98,23 @@ export const PersonalizationModal = ({
   const calculateTotal = () => {
     let total = basePrice;
     total += paidToppings.length * 1.99;
-    total += syrup ? 1.99 : 0;
+    // Caldas agora são grátis
     return total;
   };
 
   const handleConfirm = () => {
-    if (freeToppings.length === 0) {
-      toast.error("Escolha pelo menos 1 adicional grátis!");
+    if (freeFruits.length === 0) {
+      toast.error("Escolha pelo menos 1 fruta grátis!");
+      return;
+    }
+    if (freeConfeitos.length === 0) {
+      toast.error("Escolha pelo menos 1 confeito/crocante grátis!");
       return;
     }
 
     const customization: CustomizationData = {
-      freeToppings,
+      freeFruits,
+      freeConfeitos,
       paidToppings,
       syrup,
       totalPrice: calculateTotal(),
@@ -97,7 +123,8 @@ export const PersonalizationModal = ({
     onConfirm(customization);
     
     // Reset
-    setFreeToppings([]);
+    setFreeFruits([]);
+    setFreeConfeitos([]);
     setPaidToppings([]);
     setSyrup("");
     onClose();
@@ -113,24 +140,48 @@ export const PersonalizationModal = ({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Adicionais Grátis */}
+          {/* Frutas Grátis */}
           <div>
             <h3 className="font-bold text-lg mb-3 text-primary">
-              Adicionais Grátis (Escolha 1)
+              Frutas (Escolha 1 - Grátis)
             </h3>
             <div className="grid grid-cols-2 gap-3">
-              {freeToppingsOptions.map((topping) => (
-                <div key={topping} className="flex items-center space-x-2">
+              {freeFruitOptions.map((fruit) => (
+                <div key={fruit} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`free-${topping}`}
-                    checked={freeToppings.includes(topping)}
-                    onCheckedChange={() => handleFreeToppingToggle(topping)}
+                    id={`fruit-${fruit}`}
+                    checked={freeFruits.includes(fruit)}
+                    onCheckedChange={() => handleFreeFruitToggle(fruit)}
                   />
                   <Label
-                    htmlFor={`free-${topping}`}
+                    htmlFor={`fruit-${fruit}`}
                     className="cursor-pointer"
                   >
-                    {topping}
+                    {fruit}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Confeitos/Crocantes Grátis */}
+          <div>
+            <h3 className="font-bold text-lg mb-3 text-primary">
+              Confeitos/Crocantes (Escolha 1 - Grátis)
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {freeConfeitosOptions.map((confeito) => (
+                <div key={confeito} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`confeito-${confeito}`}
+                    checked={freeConfeitos.includes(confeito)}
+                    onCheckedChange={() => handleFreeConfeitoToggle(confeito)}
+                  />
+                  <Label
+                    htmlFor={`confeito-${confeito}`}
+                    className="cursor-pointer"
+                  >
+                    {confeito}
                   </Label>
                 </div>
               ))}
@@ -164,7 +215,7 @@ export const PersonalizationModal = ({
           {/* Caldas */}
           <div>
             <h3 className="font-bold text-lg mb-3 text-primary">
-              Calda (Escolha 1 - R$ 1,99)
+              Calda (Escolha 1 - Grátis)
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {syrupOptions.map((option) => (
@@ -178,7 +229,7 @@ export const PersonalizationModal = ({
                     htmlFor={`syrup-${option.name}`}
                     className="cursor-pointer"
                   >
-                    {option.name} - R$ {option.price.toFixed(2)}
+                    {option.name} - Grátis
                   </Label>
                 </div>
               ))}
