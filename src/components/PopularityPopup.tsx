@@ -91,7 +91,7 @@ export const PopularityPopup = () => {
         setProofData((prev) => {
           const updated = {
             ...prev,
-            viewers: Math.min(prev.viewers + Math.floor(Math.random() * 3), 50),
+            viewers: Math.min(prev.viewers + Math.floor(Math.random() * 3),
             dailySales: Math.random() > 0.7 ? prev.dailySales + 1 : prev.dailySales,
             weeklyOrders: Math.random() > 0.8 ? prev.weeklyOrders + 1 : prev.weeklyOrders,
           };
@@ -99,7 +99,7 @@ export const PopularityPopup = () => {
           return updated;
         });
       }
-    }, 15000); // A cada 15 segundos
+    }, 30000); // A cada 30 segundos
 
     return () => clearInterval(incrementInterval);
   }, []);
