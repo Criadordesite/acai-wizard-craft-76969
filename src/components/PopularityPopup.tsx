@@ -140,7 +140,7 @@ export const PopularityPopup = () => {
     },
     {
       icon: <TrendingUp className="w-5 h-5" />,
-      text: `${proofData.dailySales} pessoas compraram a Barca de Açaí hoje!`,
+      text: `${proofData.dailySales} pessoas compraram a Barca de Açaí esta semana!`,
       gradient: "from-orange-500 to-red-600",
     },
   ];
