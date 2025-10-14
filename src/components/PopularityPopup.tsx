@@ -24,7 +24,7 @@ const getInitialData = (): ProofData => {
     ) {
       // Se está após 23:30 ou antes de 09:50, resetar
       const newData = {
-        viewers: Math.floor(Math.random() * 15) + 5,
+        viewers: Math.floor(Math.random() * 21) + 40,
         dailySales: Math.floor(Math.random() * 8) + 3,
         weeklyOrders: Math.floor(Math.random() * 50) + 20,
         lastReset: now.toISOString(),
@@ -38,7 +38,7 @@ const getInitialData = (): ProofData => {
   
   // Primeira vez
   const initialData = {
-    viewers: Math.floor(Math.random() * 15) + 5,
+    viewers: Math.floor(Math.random() * 21) + 40,
     dailySales: Math.floor(Math.random() * 8) + 3,
     weeklyOrders: Math.floor(Math.random() * 50) + 20,
     lastReset: now.toISOString(),
