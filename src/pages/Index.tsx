@@ -13,7 +13,10 @@ import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import acaiCopoImg from "@/assets/acai-copo-300ml.webp";
 import barcaAcaiImg from "@/assets/barca-acai-top.jpeg";
-import cocaColaImg from "@/assets/coca-cola.jpg";
+import coca220mlImg from "@/assets/coca-220ml.jpg";
+import coca350mlImg from "@/assets/coca-350ml.jpg";
+import fanta220mlImg from "@/assets/fanta-220ml.jpg";
+import fanta350mlImg from "@/assets/fanta-350ml.jpg";
 import redbullImg from "@/assets/redbull.jpg";
 import aguaCrystalImg from "@/assets/agua-crystal.jpg";
 import vitaminaImg from "@/assets/vitamina.jpg";
@@ -72,20 +75,36 @@ const acaiProducts: Product[] = [
 
 const beverages: Product[] = [
   {
-    id: "refri-220",
-    name: "Refrigerante 220ml",
+    id: "coca-220",
+    name: "Coca-Cola 220ml",
     description: "Lata gelada",
     price: 3.99,
     isReady: true,
-    image: cocaColaImg,
+    image: coca220mlImg,
   },
   {
-    id: "refri-350",
-    name: "Refrigerante 350ml",
-    description: "Garrafa gelada",
+    id: "coca-350",
+    name: "Coca-Cola 350ml",
+    description: "Lata gelada",
     price: 5.99,
     isReady: true,
-    image: cocaColaImg,
+    image: coca350mlImg,
+  },
+  {
+    id: "fanta-220",
+    name: "Fanta 220ml",
+    description: "Lata gelada",
+    price: 3.99,
+    isReady: true,
+    image: fanta220mlImg,
+  },
+  {
+    id: "fanta-350",
+    name: "Fanta 350ml",
+    description: "Lata gelada",
+    price: 5.99,
+    isReady: true,
+    image: fanta350mlImg,
   },
   {
     id: "redbull",
