@@ -69,7 +69,7 @@ export const CheckoutModal = ({ isOpen, onClose, items, total }: CheckoutModalPr
       `*💳 Pagamento:* ${formData.payment}%0A` +
       `${trocoText}`;
 
-    const whatsappNumber = "5511999999999"; // Substituir pelo número real
+    const whatsappNumber = "5551995764542"; // Substituir pelo número real
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
     
     onClose();
