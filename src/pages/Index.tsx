@@ -11,6 +11,13 @@ import { CartModal, CartItem } from "@/components/CartModal";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
+import acaiCopoImg from "@/assets/acai-copo-300ml.webp";
+import barcaAcaiImg from "@/assets/barca-acai-top.jpeg";
+import cocaColaImg from "@/assets/coca-cola.jpg";
+import redbullImg from "@/assets/redbull.jpg";
+import aguaCrystalImg from "@/assets/agua-crystal.jpg";
+import vitaminaImg from "@/assets/vitamina.jpg";
+import sucoNaturalImg from "@/assets/suco-natural.jpg";
 
 interface Product {
   id: string;
@@ -20,6 +27,7 @@ interface Product {
   isReady: boolean;
   requiresCustomization?: boolean;
   isBestSeller?: boolean;
+  image?: string;
 }
 
 const acaiProducts: Product[] = [
@@ -30,6 +38,7 @@ const acaiProducts: Product[] = [
     price: 8.99,
     isReady: false,
     requiresCustomization: true,
+    image: acaiCopoImg,
   },
   {
     id: "acai-400",
@@ -38,6 +47,7 @@ const acaiProducts: Product[] = [
     price: 12.99,
     isReady: false,
     requiresCustomization: true,
+    image: acaiCopoImg,
   },
   {
     id: "acai-500",
@@ -46,6 +56,7 @@ const acaiProducts: Product[] = [
     price: 18.99,
     isReady: false,
     requiresCustomization: true,
+    image: acaiCopoImg,
   },
   {
     id: "barca",
@@ -55,6 +66,7 @@ const acaiProducts: Product[] = [
     isReady: false,
     requiresCustomization: true,
     isBestSeller: true,
+    image: barcaAcaiImg,
   },
 ];
 
@@ -65,6 +77,7 @@ const beverages: Product[] = [
     description: "Lata gelada",
     price: 3.99,
     isReady: true,
+    image: cocaColaImg,
   },
   {
     id: "refri-350",
@@ -72,6 +85,7 @@ const beverages: Product[] = [
     description: "Garrafa gelada",
     price: 5.99,
     isReady: true,
+    image: cocaColaImg,
   },
   {
     id: "redbull",
@@ -79,6 +93,7 @@ const beverages: Product[] = [
     description: "Energia para o seu dia",
     price: 8.99,
     isReady: true,
+    image: redbullImg,
   },
   {
     id: "suco-300",
@@ -86,6 +101,7 @@ const beverages: Product[] = [
     description: "Suco natural fresquinho",
     price: 3.99,
     isReady: true,
+    image: sucoNaturalImg,
   },
   {
     id: "suco-500",
@@ -93,6 +109,7 @@ const beverages: Product[] = [
     description: "Suco natural tamanho grande",
     price: 6.99,
     isReady: true,
+    image: sucoNaturalImg,
   },
   {
     id: "vitamina",
@@ -100,6 +117,7 @@ const beverages: Product[] = [
     description: "Vitamina cremosa e nutritiva",
     price: 12.99,
     isReady: true,
+    image: vitaminaImg,
   },
   {
     id: "agua-com-gas",
@@ -107,6 +125,7 @@ const beverages: Product[] = [
     description: "Água mineral com gás",
     price: 3.49,
     isReady: true,
+    image: aguaCrystalImg,
   },
   {
     id: "agua-sem-gas",
@@ -114,6 +133,7 @@ const beverages: Product[] = [
     description: "Água mineral natural",
     price: 2.99,
     isReady: true,
+    image: aguaCrystalImg,
   },
 ];
 
@@ -259,6 +279,7 @@ const Index = () => {
                 )}
                 <ProductCard
                   {...product}
+                  image={product.image}
                   onAdd={() => handleProductClick(product.id)}
                 />
               </div>
@@ -276,6 +297,7 @@ const Index = () => {
               <ProductCard
                 key={product.id}
                 {...product}
+                image={product.image}
                 onAdd={() => handleProductClick(product.id)}
               />
             ))}
