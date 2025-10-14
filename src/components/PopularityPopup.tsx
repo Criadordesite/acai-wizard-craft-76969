@@ -63,7 +63,7 @@ export const PopularityPopup = () => {
       // Resetar às 23:30
       if (hour === 23 && minute === 30) {
         const newData = {
-          viewers: Math.floor(Math.random() * 15) + 5,
+          viewers: Math.floor(Math.random() * 21) + 40,
           dailySales: Math.floor(Math.random() * 8) + 3,
           weeklyOrders: Math.floor(Math.random() * 50) + 20,
           lastReset: now.toISOString(),
