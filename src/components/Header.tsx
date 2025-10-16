@@ -1,5 +1,6 @@
 import { ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PromoButton } from "@/components/PromoButton";
 import logo from "@/assets/logo.webp";
 
 interface HeaderProps {
@@ -16,18 +17,22 @@ export const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
             <img src={logo} alt="THE BEST AÇAÍ Logo" className="h-12 w-auto" />
           </div>
           
-          <button
-            onClick={onCartClick}
-            className="relative rounded-full p-3 transition-all hover:scale-105 shadow-elegant"
-            style={{ backgroundColor: '#FF9900' }}
-          >
-            <ShoppingCart className="h-6 w-6" style={{ color: '#000000' }} />
-            {cartItemsCount > 0 && (
-              <Badge className="absolute -top-2 -right-2 px-2 min-w-[24px] h-6 flex items-center justify-center font-bold" style={{ backgroundColor: '#FF9900', color: '#000000', border: '2px solid #000' }}>
-                {cartItemsCount}
-              </Badge>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <PromoButton />
+            
+            <button
+              onClick={onCartClick}
+              className="relative rounded-full p-3 transition-all hover:scale-105 shadow-elegant"
+              style={{ backgroundColor: '#FF9900' }}
+            >
+              <ShoppingCart className="h-6 w-6" style={{ color: '#000000' }} />
+              {cartItemsCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 px-2 min-w-[24px] h-6 flex items-center justify-center font-bold" style={{ backgroundColor: '#FF9900', color: '#000000', border: '2px solid #000' }}>
+                  {cartItemsCount}
+                </Badge>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </header>
