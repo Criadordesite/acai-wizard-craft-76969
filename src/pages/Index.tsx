@@ -11,7 +11,9 @@ import { CartModal, CartItem } from "@/components/CartModal";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
-import acaiCopoImg from "@/assets/acai-copo-300ml.webp";
+import acai300mlImg from "@/assets/acai-300ml.jpg";
+import acai500mlImg from "@/assets/acai-500ml.jpg";
+import acai700mlImg from "@/assets/acai-700ml.jpg";
 import barcaAcaiImg from "@/assets/barca-acai-top.jpeg";
 import coca220mlImg from "@/assets/coca-220ml.jpg";
 import coca350mlImg from "@/assets/coca-350ml.jpg";
@@ -41,7 +43,7 @@ const acaiProducts: Product[] = [
     price: 8.99,
     isReady: false,
     requiresCustomization: true,
-    image: acaiCopoImg,
+    image: acai300mlImg,
   },
   {
     id: "acai-400",
@@ -50,7 +52,7 @@ const acaiProducts: Product[] = [
     price: 12.99,
     isReady: false,
     requiresCustomization: true,
-    image: acaiCopoImg,
+    image: acai500mlImg,
   },
   {
     id: "acai-500",
@@ -59,7 +61,7 @@ const acaiProducts: Product[] = [
     price: 18.99,
     isReady: false,
     requiresCustomization: true,
-    image: acaiCopoImg,
+    image: acai700mlImg,
   },
   {
     id: "barca",
