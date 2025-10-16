@@ -1,14 +1,16 @@
 import { ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PromoButton } from "@/components/PromoButton";
+import { CouponButton } from "@/components/CouponButton";
 import logo from "@/assets/logo.webp";
 
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
+  onCouponClick: () => void;
 }
 
-export const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
+export const Header = ({ cartItemsCount, onCartClick, onCouponClick }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 backdrop-blur-sm" style={{ backgroundColor: '#000000' }}>
       <div className="container mx-auto px-4 py-4">
@@ -19,6 +21,7 @@ export const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
           
           <div className="flex items-center gap-2">
             <PromoButton />
+            <CouponButton onClick={onCouponClick} />
             
             <button
               onClick={onCartClick}

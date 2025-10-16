@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { PersonalizationModal, CustomizationData } from "@/components/PersonalizationModal";
 import { CartModal, CartItem } from "@/components/CartModal";
 import { CheckoutModal } from "@/components/CheckoutModal";
+import { CouponModal } from "@/components/CouponModal";
 import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import acai300mlImg from "@/assets/acai-300ml.jpg";
@@ -162,9 +163,11 @@ const Index = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [promoApplied, setPromoApplied] = useState(false);
   const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: "frete" | "desconto"; discount?: number } | null>(null);
 
   const allProducts = [...acaiProducts, ...beverages];
 
@@ -269,9 +272,28 @@ const Index = () => {
     setIsCheckoutOpen(true);
   };
 
+  const handleApplyCoupon = (code: string, type: "frete" | "desconto", discount?: number) => {
+    setAppliedCoupon({ code, type, discount });
+  };
+
+  // Calcular o total com desconto aplicado
+  const calculateTotal = () => {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    if (appliedCoupon?.type === "desconto" && appliedCoupon.discount) {
+      return Math.max(0, subtotal - appliedCoupon.discount);
+    }
+    return subtotal;
+  };
+
+  const finalTotal = calculateTotal();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header cartItemsCount={totalItems} onCartClick={() => setIsCartOpen(true)} />
+      <Header 
+        cartItemsCount={totalItems} 
+        onCartClick={() => setIsCartOpen(true)}
+        onCouponClick={() => setIsCouponModalOpen(true)}
+      />
       
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Hero Carousel */}
@@ -363,13 +385,22 @@ const Index = () => {
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeItem}
         onCheckout={handleCheckout}
+        appliedCoupon={appliedCoupon}
+        finalTotal={finalTotal}
       />
 
       <CheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         items={cart}
-        total={total}
+        total={finalTotal}
+      />
+
+      <CouponModal
+        isOpen={isCouponModalOpen}
+        onClose={() => setIsCouponModalOpen(false)}
+        cartTotal={total}
+        onApplyCoupon={handleApplyCoupon}
       />
 
       {selectedProduct && (

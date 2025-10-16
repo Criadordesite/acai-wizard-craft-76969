@@ -17,6 +17,8 @@ interface CartModalProps {
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveItem: (id: string) => void;
   onCheckout: () => void;
+  appliedCoupon?: { code: string; type: "frete" | "desconto"; discount?: number } | null;
+  finalTotal?: number;
 }
 
 export const CartModal = ({
@@ -26,9 +28,12 @@ export const CartModal = ({
   onUpdateQuantity,
   onRemoveItem,
   onCheckout,
+  appliedCoupon,
+  finalTotal,
 }: CartModalProps) => {
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const displayTotal = finalTotal !== undefined ? finalTotal : total;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -108,9 +113,37 @@ export const CartModal = ({
           <>
             <Separator className="my-4" />
             <div className="space-y-4">
+              {/* Subtotal */}
+              <div className="flex items-center justify-between text-lg">
+                <span>Subtotal:</span>
+                <span>R$ {total.toFixed(2)}</span>
+              </div>
+              
+              {/* Cupom aplicado */}
+              {appliedCoupon && (
+                <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-green-700 dark:text-green-300">
+                        {appliedCoupon.type === "frete" ? "🚚 Entrega Grátis" : "💰 Desconto"}
+                      </p>
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        Cupom: {appliedCoupon.code}
+                      </p>
+                    </div>
+                    {appliedCoupon.type === "desconto" && appliedCoupon.discount && (
+                      <span className="text-green-700 dark:text-green-300 font-bold">
+                        - R$ {appliedCoupon.discount.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {/* Total final */}
               <div className="flex items-center justify-between text-xl font-bold">
                 <span>Total:</span>
-                <span className="text-primary">R$ {total.toFixed(2)}</span>
+                <span className="text-primary">R$ {displayTotal.toFixed(2)}</span>
               </div>
               
               <Button
