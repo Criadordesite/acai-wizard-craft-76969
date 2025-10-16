@@ -89,17 +89,24 @@ export const PopularityPopup = () => {
       // Só incrementar se a loja estiver aberta
       if (currentTime >= openTime && currentTime < closeTime) {
         setProofData((prev) => {
+          const newDailySales = Math.random() > 0.7 ? prev.dailySales + 1 : prev.dailySales;
+          const viewersIncrement = Math.floor(Math.random() * 3) + 1;
+          const newViewers = prev.viewers + viewersIncrement;
+          
+          // Garantir que viewers seja sempre maior que dailySales
+          const adjustedViewers = newViewers <= newDailySales ? newDailySales + Math.floor(Math.random() * 10) + 5 : newViewers;
+          
           const updated = {
             ...prev,
-            viewers: prev.viewers + Math.floor(Math.random() * 3),
-            dailySales: Math.random() > 0.7 ? prev.dailySales + 1 : prev.dailySales,
+            viewers: adjustedViewers,
+            dailySales: newDailySales,
             weeklyOrders: Math.random() > 0.8 ? prev.weeklyOrders + 1 : prev.weeklyOrders,
           };
           localStorage.setItem("proofData", JSON.stringify(updated));
           return updated;
         });
       }
-    }, 30000); // A cada 30 segundos
+    }, 15000); // A cada 15 segundos
 
     return () => clearInterval(incrementInterval);
   }, []);
